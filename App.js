@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button, Text, TextInput, View, Image} from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 function HomeScreen({route, navigation}) {
   const [count, setCount] = React.useState(0);
@@ -27,7 +28,7 @@ function HomeScreen({route, navigation}) {
         {() => (
           <View style={{flex: 1, backgroundColor: "white"}}>
             <View style={{flex: 1/10, margin: 10, justifyContent: 'center', alignItems: 'center'}}>
-              <Text style={{fontWeight: 'bold', fontSize: '20'}}>Count: {count}</Text>
+              <Text style={{fontWeight: 'bold', fontSize: 20}}>Count: {count}</Text>
             </View>
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Button
@@ -87,7 +88,7 @@ function LogoTitle(){
 }
 
 const Stack = createNativeStackNavigator();
-const Tab = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
 function App() {
   return (
