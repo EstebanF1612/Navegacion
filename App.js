@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Button, Text, TextInput, View, Image} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 function HomeScreen({route, navigation}) {
   const [count, setCount] = React.useState(0);
@@ -40,7 +41,6 @@ function HomeScreen({route, navigation}) {
         </View>
         )}
       </Stack.Screen>
-      <Stack.Screen name='ProfileScreen' component={ProfileScreen}/>
     </Stack.Navigator>
     
     
@@ -87,14 +87,33 @@ function LogoTitle(){
   );
 }
 
+function Settings(){
+  return(
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Settings Screen</Text>
+    </View>
+  );
+}
+
+function Root(){
+  return(
+    <Drawer.Navigator>
+      <Drawer.Screen name="Home" component={HomeScreen}/>
+      <Drawer.Screen name="Profile" component={ProfileScreen}/>
+      <Drawer.Screen name="Settings" component={Settings}/>
+    </Drawer.Navigator>
+  );
+}
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator 
-        initialRouteName="Home"
+        initialRouteName="Root"
         screenOptions={{
           headerStyle: {
             backgroundColor: '#f4511e',
@@ -105,6 +124,11 @@ function App() {
           },
         }}
       >
+        <Tab.Screen 
+          name="Root" 
+          component={Root} 
+          options={{headerShown: false}}
+        />
         <Tab.Screen name="Home" 
           component={HomeScreen} 
           options={({navigation, route}) => ({
