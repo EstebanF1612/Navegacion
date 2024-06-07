@@ -1,9 +1,17 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button, Text, TextInput, View, Image} from 'react-native';
+import { Button, Text, TextInput, View, Image, Alert} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import appFirebase from './credenciales';
+import {getFirestore, collection, addDoc, getDocs, doc, deleteDoc, getDoc, setDoc} from 'firebase/firestore';
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+const db = getFirestore(appFirebase);
+
 
 function HomeScreen({route, navigation}) {
   const [count, setCount] = React.useState(0);
@@ -25,7 +33,7 @@ function HomeScreen({route, navigation}) {
   
   return (
     <Stack.Navigator>
-      <Stack.Screen name='Main Screen'>
+      <Stack.Screen name='Main Screen' options={{headerShown: false}}>
         {() => (
           <View style={{flex: 1, backgroundColor: "white"}}>
             <View style={{flex: 1/10, margin: 10, justifyContent: 'center', alignItems: 'center'}}>
@@ -34,7 +42,7 @@ function HomeScreen({route, navigation}) {
             <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <Button
                 title="Create a Post"
-                onPress={() => navigation.navigate('CreatePost')}
+                onPress={() => navigation.navigate('Create Post')}
                 />
                 <Text style={{margin: 10}}>Post: {route.params?.post}</Text>
             </View>
@@ -48,23 +56,34 @@ function HomeScreen({route, navigation}) {
 }
 function CreatePostScreen({navigation, route}) {
   const [postText, setPostText] = React.useState('');
+  const savePost = async () => {
+    try{
+      await addDoc(collection(db, 'Posts'),{
+        ...postText
+      }) 
+      Alert.alert('Post published!');
+      navigation.navigate({
+        name: 'Home',
+        params: {post: postText},
+        merge: true,
+      });
+    }
+    catch(e){
+      console.error(error);
+    }
+  }
   return (
     <>
       <TextInput
         multiline
         placeholder="What's on your mind?"
-        style={{height: 200, padding: 10, backgroundColor: 'white'}}
+        style={{height: 200, padding: 10, backgroundColor: 'white', margin: 10, borderRadius: 10}}
         value={postText}
         onChangeText={setPostText}
       />
       <Button
         title = "Done"
-        onPress={() => {navigation.navigate({
-          name: 'Home',
-          params: {post: postText},
-          merge: true,
-          });
-        }}
+        onPress={savePost}
       />
     </>
   );
@@ -95,25 +114,31 @@ function Settings(){
   );
 }
 
-function Root(){
+function FeedHome(){
   return(
-    <Drawer.Navigator>
-      <Drawer.Screen name="Home" component={HomeScreen}/>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Feed Home Screen</Text>
+    </View>
+  );
+}
+
+function Feed(){
+  return(
+    <Drawer.Navigator screenOptions={{headerTintColor: '#f4511e'}}>
+      <Drawer.Screen name="Feed Home" component={FeedHome}/>
       <Drawer.Screen name="Profile" component={ProfileScreen}/>
       <Drawer.Screen name="Settings" component={Settings}/>
     </Drawer.Navigator>
   );
 }
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
+
 
 function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator 
-        initialRouteName="Root"
+        initialRouteName="Feed"
         screenOptions={{
           headerStyle: {
             backgroundColor: '#f4511e',
@@ -125,8 +150,8 @@ function App() {
         }}
       >
         <Tab.Screen 
-          name="Root" 
-          component={Root} 
+          name="Feed" 
+          component={Feed} 
           options={{headerShown: false}}
         />
         <Tab.Screen name="Home" 
@@ -142,7 +167,7 @@ function App() {
           })}
         />
         <Tab.Screen 
-          name="CreatePost" 
+          name="Create Post" 
           component={CreatePostScreen} 
           options={{
             headerBackTitle: 'Back',
