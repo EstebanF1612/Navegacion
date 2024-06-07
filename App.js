@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Button, Text, TextInput, View, Image, Alert} from 'react-native';
+import { Button, Text, TextInput, View, Image, Alert, ScrollView} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import appFirebase from './credenciales';
@@ -115,10 +115,43 @@ function Settings(){
 }
 
 function FeedHome(){
+
+  const [lista, setLista] = React.useState([]);
+
+  React.useEffect(() => {
+    const getLista = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'Posts'));
+        const docs = [];
+        querySnapshot.forEach((doc) => {
+          docs.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setLista(docs);
+      }
+      catch(e){
+        console.log(error);
+      }
+    }
+    getLista();
+  }, []);
+
   return(
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Feed Home Screen</Text>
-    </View>
+    <ScrollView>
+      <View style={{justifyContent: 'center', alignItems:'center', marginRight: 10, marginLeft: 10, backgroundColor: '#f4511e', borderBottomRightRadius: 10, borderBottomLeftRadius: 10}}>
+        <Text style={{fontWeight: 'bold', fontSize: 25, color: 'white'}}>Publicaciones</Text>
+      </View>
+
+      <View>
+        {
+          lista.map((list) => (
+            <Text key={list.id} style={{margin: 10, padding: 10, backgroundColor: 'white', borderRadius: 10}}>{list.data}</Text>
+          ))
+        }
+      </View>
+    </ScrollView>
   );
 }
 
